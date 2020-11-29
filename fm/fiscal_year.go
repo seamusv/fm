@@ -10,6 +10,10 @@ func CurrentFiscalYear() *FiscalYear {
 	return &FiscalYear{t: time.Now()}
 }
 
+func NewFiscalYear(t time.Time) *FiscalYear {
+	return &FiscalYear{t: t}
+}
+
 func (f FiscalYear) Begin() *FiscalYear {
 	var year = f.t.Year()
 	if f.t.Month() < time.April {

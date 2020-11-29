@@ -13,6 +13,7 @@ type (
 	Response struct {
 		internalResponse *XMLResponse
 		data             map[string]string
+		messages         map[string]string
 	}
 )
 
@@ -25,9 +26,14 @@ func Parse(b []byte) (*Response, error) {
 	for _, field := range ir.Fields {
 		data[field.Name] = field.Value
 	}
+	messages := make(map[string]string)
+	for _, message := range ir.Messages {
+		messages[message.Number] = message.Description
+	}
 	return &Response{
 		internalResponse: ir,
 		data:             data,
+		messages:         messages,
 	}, nil
 }
 
@@ -91,4 +97,13 @@ func (r *Response) Unmarshal(v interface{}) error {
 func (r *Response) FieldValue(field string) (string, bool) {
 	data, ok := r.data[field]
 	return data, ok
+}
+
+func (r *Response) MessageContainsOneOf(messages ...string) bool {
+	for _, message := range messages {
+		if _, ok := r.messages[message]; ok {
+			return ok
+		}
+	}
+	return false
 }

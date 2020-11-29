@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func GeneratePurchaseOrderNumber(processor Processor, input []byte) ([]byte, error) {
+func GeneratePurchaseOrderNumber(processor Processor, businessDate time.Time, input []byte) ([]byte, error) {
 	request := struct {
 		CorrelationKey    string `json:"correlationKey" validate:"required"`
 		Organisation      string `json:"organisation" validate:"required,max=6"`
@@ -29,15 +29,15 @@ func GeneratePurchaseOrderNumber(processor Processor, input []byte) ([]byte, err
 
 	resultCh := make(chan error, 1)
 	processor.Process(func(e Executor) {
-		e.Login(NoLoginProfile, request.Organisation, time.Now())
+		e.Login(NoLoginProfile, request.Organisation, businessDate)
 		defer e.Logout()
 
 		e.Execute("PO401", "Z00007")
-		po401 := &screens.PO401{
+		po401 := screens.PO401{
 			IDORDR:   fm.String(request.OrderNumberPrefix),
 			IDVEND:   fm.String(request.VendorCode),
 			LINEBILL: fm.String(request.BillingAddress),
-			LINESCHD: fm.Time(fm.CurrentFiscalYear().End().Time()),
+			LINESCHD: fm.Time(fm.NewFiscalYear(businessDate).End().Time()),
 			LINESHPT: fm.String(request.ShippingAddress),
 		}
 		e.ExecuteFields("ADD", po401, "Z00062")
