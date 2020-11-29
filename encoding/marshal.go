@@ -1,18 +1,17 @@
-package fm
+package encoding
 
 // https://itnext.io/creating-your-own-struct-field-tags-in-go-c6c86727eff
 
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/seamusv/fm-integration/fm/internal"
 	"reflect"
 	"strconv"
 	"time"
 )
 
-func Marshal(operation string, v interface{}) ([]byte, error) {
-	fields := make([]internal.Field, 0)
+func Fields(v interface{}) ([]Field, error) {
+	fields := make([]Field, 0)
 
 	rv := reflect.ValueOf(v)
 	t := rv.Type()
@@ -49,14 +48,22 @@ func Marshal(operation string, v interface{}) ([]byte, error) {
 				default:
 					return nil, fmt.Errorf("no support for '%s %T'", t.Field(i).Name, v)
 				}
-				fields = append(fields, internal.Field{Name: name, Value: strValue})
+				fields = append(fields, Field{Name: name, Value: strValue})
 			}
 		}
 	}
 
-	transaction := &internal.Request{
+	return fields, nil
+}
+
+func Marshal(operation string, v interface{}) ([]byte, error) {
+	fields, err := Fields(v)
+	if err != nil {
+		return nil, err
+	}
+	transaction := &XMLRequest{
 		Gui:     "N",
-		Command: internal.Command{Operation: operation},
+		Command: Command{Operation: operation},
 		Fields:  fields,
 	}
 

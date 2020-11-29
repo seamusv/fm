@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/seamusv/fm-integration/encoding"
 	"github.com/seamusv/fm-integration/fm"
 	"log"
 	"os"
@@ -30,14 +31,14 @@ func main() {
 		RequiredDate: fm.Time(time.Now().Add(time.Hour * 24 * 7)),
 	}
 
-	b, err := fm.Marshal("ADD", line)
+	b, err := encoding.Marshal("ADD", line)
 	if err != nil {
 		log.Fatal(err)
 	}
 	os.Stdout.Write(b)
 	fmt.Print("\n\n-------------\n\n")
 
-	res, err := fm.Parse([]byte(`<trans ok="Y"><screendata><return-fields><f n="STTSPRT" v="Y"></f><f n="IDBUYR" v="FMISPR"></f><f n="CODESTTS" v="2020/12/31"></f><f n="SWNOTEH" v="N"></f><f n="TEXTFRT" v=""></f><f n="CNTREL" v="6942"></f><f n="SWNOTEHN" v="N"></f><f n="LINEWHSE" v=""></f><f n="NAMEVEND" v=""></f><f n="TEXTOP01" v="TENDER TYPE"></f><f n="IDOP03" v=""></f><f n="IDOP02" v=""></f><f n="TAX02" v=""></f><f n="SPCLINST" v=""></f><f n="LINECARR" v=""></f><f n="TEXTOP03" v="SOA #"></f><f n="TEXTCARR" v=""></f><f n="CNTREV" v="0"></f><f n="LINEFOB" v=""></f><f n="LINESHPT" v=""></f><f n="TAX04" v=""></f><f n="IDLOCN" v="0"></f><f n="LINEBILL" v=""></f><f n="TAXENRP" v=""></f><f n="LINESHTY" v="1"></f><f n="IDORDR" v=""></f><f n="LASTPRT" v=""></f><f n="TAX01" v=""></f><f n="LINESCHD" v=""></f><f n="TAX03" v=""></f><f n="IDCURN" v=""></f><f n="NETORDR" v="0.00 "></f><f n="LINEMTCH" v="0"></f><f n="LINEROUT" v=""></f><f n="IDVEND" v=""></f><f n="SWNOTET" v="N"></f><f n="TEXTFOB" v=""></f><f n="LINEDLVY" v=""></f><f n="IDOP01" v=""></f><f n="LINETOL" v=""></f><f n="SWREL" v="N"></f><f n="TEXTSTTS" v="UNRELEASED"></f><f n="TEXTOP02" v="CONTRACT TYPE"></f><f n="PARTYPE" v="1"></f><f n="LINEFRT" v=""></f><f n="TEXTCTRC" v=""></f></return-fields></screendata><msgs><msg no="Z00007" v="Please enter key field"></msg></msgs></trans>`))
+	res, err := encoding.Parse([]byte(`<trans ok="Y"><screendata><return-fields><f n="STTSPRT" v="Y"></f><f n="IDBUYR" v="FMISPR"></f><f n="CODESTTS" v="2020/12/31"></f><f n="SWNOTEH" v="N"></f><f n="TEXTFRT" v=""></f><f n="CNTREL" v="6942"></f><f n="SWNOTEHN" v="N"></f><f n="LINEWHSE" v=""></f><f n="NAMEVEND" v=""></f><f n="TEXTOP01" v="TENDER TYPE"></f><f n="IDOP03" v=""></f><f n="IDOP02" v=""></f><f n="TAX02" v=""></f><f n="SPCLINST" v=""></f><f n="LINECARR" v=""></f><f n="TEXTOP03" v="SOA #"></f><f n="TEXTCARR" v=""></f><f n="CNTREV" v="0"></f><f n="LINEFOB" v=""></f><f n="LINESHPT" v=""></f><f n="TAX04" v=""></f><f n="IDLOCN" v="0"></f><f n="LINEBILL" v=""></f><f n="TAXENRP" v=""></f><f n="LINESHTY" v="1"></f><f n="IDORDR" v=""></f><f n="LASTPRT" v=""></f><f n="TAX01" v=""></f><f n="LINESCHD" v=""></f><f n="TAX03" v=""></f><f n="IDCURN" v=""></f><f n="NETORDR" v="0.00 "></f><f n="LINEMTCH" v="0"></f><f n="LINEROUT" v=""></f><f n="IDVEND" v=""></f><f n="SWNOTET" v="N"></f><f n="TEXTFOB" v=""></f><f n="LINEDLVY" v=""></f><f n="IDOP01" v=""></f><f n="LINETOL" v=""></f><f n="SWREL" v="N"></f><f n="TEXTSTTS" v="UNRELEASED"></f><f n="TEXTOP02" v="CONTRACT TYPE"></f><f n="PARTYPE" v="1"></f><f n="LINEFRT" v=""></f><f n="TEXTCTRC" v=""></f></return-fields></screendata><msgs><msg no="Z00007" v="Please enter key field"></msg></msgs></trans>`))
 	if err != nil {
 		log.Fatal(err)
 	}

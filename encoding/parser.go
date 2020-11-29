@@ -1,9 +1,9 @@
-package fm
+package encoding
 
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/seamusv/fm-integration/fm/internal"
+	"github.com/seamusv/fm-integration/fm"
 	"reflect"
 	"strconv"
 	"time"
@@ -11,13 +11,13 @@ import (
 
 type (
 	Response struct {
-		internalResponse *internal.Response
+		internalResponse *XMLResponse
 		data             map[string]string
 	}
 )
 
 func Parse(b []byte) (*Response, error) {
-	ir := &internal.Response{}
+	ir := &XMLResponse{}
 	if err := xml.Unmarshal(b, ir); err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (r *Response) Unmarshal(v interface{}) error {
 				}
 				switch v := field.Interface().(type) {
 				case *string:
-					field.Set(reflect.ValueOf(String(r.data[name])))
+					field.Set(reflect.ValueOf(fm.String(r.data[name])))
 					break
 				case *int64:
 					if len(dataValue) > 0 {
@@ -54,7 +54,7 @@ func (r *Response) Unmarshal(v interface{}) error {
 						if err != nil {
 							return fmt.Errorf("error parsing '%s' as %T: %s", name, v, dataValue)
 						}
-						field.Set(reflect.ValueOf(Int64(i)))
+						field.Set(reflect.ValueOf(fm.Int64(i)))
 					}
 					break
 				case *int:
@@ -63,12 +63,12 @@ func (r *Response) Unmarshal(v interface{}) error {
 						if err != nil {
 							return fmt.Errorf("error parsing '%s' as %T: %s", name, v, dataValue)
 						}
-						field.Set(reflect.ValueOf(Int(i)))
+						field.Set(reflect.ValueOf(fm.Int(i)))
 					}
 					break
 				case *bool:
 					if len(dataValue) > 0 {
-						field.Set(reflect.ValueOf(Bool(dataValue == "Y")))
+						field.Set(reflect.ValueOf(fm.Bool(dataValue == "Y")))
 					}
 					break
 				case *time.Time:
@@ -77,7 +77,7 @@ func (r *Response) Unmarshal(v interface{}) error {
 						if err != nil {
 							return fmt.Errorf("error parsing '%s' as %T: %s", name, v, dataValue)
 						}
-						field.Set(reflect.ValueOf(Time(t)))
+						field.Set(reflect.ValueOf(fm.Time(t)))
 					}
 				default:
 					return fmt.Errorf("no support for '%s %T'", t.Field(i).Name, v)
@@ -86,4 +86,9 @@ func (r *Response) Unmarshal(v interface{}) error {
 		}
 	}
 	return nil
+}
+
+func (r *Response) FieldValue(field string) (string, bool) {
+	data, ok := r.data[field]
+	return data, ok
 }
