@@ -1,10 +1,12 @@
 package jobs
 
 import (
+	"fmt"
 	"github.com/seamusv/fm-integration/encoding"
 	"github.com/seamusv/fm-integration/jobs/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"strings"
 	"testing"
 	"time"
 )
@@ -24,7 +26,7 @@ func TestGeneratePurchaseOrderNumber(t *testing.T) {
 		})
 	executor.On("Execute", "PROCESS", "P40163").Return(
 		func(command string, expectedCodes ...string) *encoding.Response {
-			r, err := encoding.Parse([]byte(`<trans ok="Y"><screendata><return-fields><f n="IDORDR" v="C00006942"/></return-fields></screendata></trans>`))
+			r, err := encoding.Parse(buildMockXMLResponse(map[string]string{"IDORDR": "C00006942"}))
 			assert.NoError(t, err)
 			return r
 		})
@@ -66,4 +68,12 @@ func buildFieldMap(screen interface{}) (map[string]string, error) {
 
 func buildDate(year int, month time.Month, day int) time.Time {
 	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+}
+
+func buildMockXMLResponse(fields map[string]string) []byte {
+	elements := make([]string, 0)
+	for n, v := range fields {
+		elements = append(elements, fmt.Sprintf(`<f n="%s" v="%s" />`, n, v))
+	}
+	return []byte(fmt.Sprintf(`<trans ok="Y"><screendata><return-fields>%s</return-fields></screendata></trans>`, strings.Join(elements, "")))
 }
