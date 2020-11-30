@@ -1,12 +1,21 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/seamusv/fm-integration/encoding"
 	"github.com/seamusv/fm-integration/fm"
+	"github.com/seamusv/fm-integration/http"
+	"github.com/seamusv/fm-integration/jobs"
 	"log"
 	"os"
 	"time"
+)
+
+var (
+	fmUrl      = flag.String("url", "", "URL to FM")
+	fmUser     = flag.String("user", "", "FM Username")
+	fmPassword = flag.String("password", "", "FM Password")
 )
 
 type (
@@ -52,6 +61,33 @@ func main() {
 	fmt.Printf("Int 64: %d\n", *po501.AInt64)
 	fmt.Printf("Time: %v\n", *po501.ATime)
 	fmt.Printf("Bool: %v\n", *po501.ABool)
+
+	fmt.Print("\n\n-------------\n\n")
+
+	flag.Parse()
+	clientBuilder := http.NewClient(*fmUrl, *fmUser, *fmPassword)
+	processor := MyProcessor{ClientBuilder: clientBuilder}
+	input := []byte(`{
+	  "correlationKey":    "corr-123",
+	  "organisation":      "YUKON",
+	  "orderNumberPrefix": "C",
+	  "billingAddress":    "BHPWICTW10",
+	  "shippingAddress":   "SHPWICTW10",
+	  "vendorCode":        "CDMAKEITINC"
+	}`)
+	output, err := jobs.GeneratePurchaseOrderNumber(processor, time.Now(), input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Output: %s\n", string(output))
+}
+
+type MyProcessor struct {
+	ClientBuilder http.ClientBuilder
+}
+
+func (m MyProcessor) Process(f func(jobs.Executor)) {
+	f(m.ClientBuilder())
 }
 
 // OUTPUT:

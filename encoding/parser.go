@@ -6,6 +6,7 @@ import (
 	"github.com/seamusv/fm-integration/fm"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -99,11 +100,15 @@ func (r *Response) FieldValue(field string) (string, bool) {
 	return data, ok
 }
 
-func (r *Response) MessageContainsOneOf(messages ...string) bool {
-	for _, message := range messages {
-		if _, ok := r.messages[message]; ok {
-			return ok
+func (r *Response) MessageContainsOneOf(messages ...string) error {
+	errors := make([]string, 0)
+	for k, v := range r.messages {
+		for _, m := range messages {
+			if k == m {
+				return nil
+			}
 		}
+		errors = append(errors, fmt.Sprintf("%s: %s", k, v))
 	}
-	return false
+	return fmt.Errorf("expecting one of [%s], received: %s", strings.Join(messages, ", "), strings.Join(errors, "; "))
 }

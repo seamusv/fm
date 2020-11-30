@@ -39,6 +39,12 @@ func GeneratePurchaseOrderNumber(processor Processor, businessDate time.Time, in
 			LINEBILL: fm.String(request.BillingAddress),
 			LINESCHD: fm.Time(fm.NewFiscalYear(businessDate).End().Time()),
 			LINESHPT: fm.String(request.ShippingAddress),
+			IDOP01:   fm.String("INVITATIONAL"),
+			IDOP02:   fm.String("SERVICE"),
+			LINEMTCH: fm.Int(0),
+			LINESHTY: fm.Int(1),
+			PARTYPE:  fm.Int(2),
+			LINETOL:  fm.String("TOL3"),
 		}
 		e.ExecuteFields("ADD", po401, "Z00062")
 		if res := e.Execute("PROCESS", "P40163"); res != nil {
