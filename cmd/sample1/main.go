@@ -9,6 +9,7 @@ import (
 	"github.com/seamusv/fm-integration/jobs"
 	"log"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -66,7 +67,11 @@ func main() {
 
 	flag.Parse()
 	clientBuilder := http.NewClient(*fmUrl, *fmUser, *fmPassword)
-	processor := MyProcessor{ClientBuilder: clientBuilder}
+	processor := NewMyProcessor(clientBuilder)
+	processor.Start()
+
+	wg := sync.WaitGroup{}
+
 	input := []byte(`{
 	  "correlationKey":    "corr-123",
 	  "organisation":      "YUKON",
@@ -75,19 +80,52 @@ func main() {
 	  "shippingAddress":   "SHPWICTW10",
 	  "vendorCode":        "CDMAKEITINC"
 	}`)
-	output, err := jobs.GeneratePurchaseOrderNumber(processor, time.Now(), input)
-	if err != nil {
-		log.Fatal(err)
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			output, err := jobs.GeneratePurchaseOrderNumber(processor, time.Now(), input)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Printf("Output: %s", string(output))
+		}()
 	}
-	fmt.Printf("Output: %s\n", string(output))
+
+	wg.Wait()
+	processor.Stop()
 }
 
 type MyProcessor struct {
 	ClientBuilder http.ClientBuilder
+	jobCh         chan func(jobs.Executor)
 }
 
-func (m MyProcessor) Process(f func(jobs.Executor)) {
-	f(m.ClientBuilder())
+func NewMyProcessor(cb http.ClientBuilder) *MyProcessor {
+	return &MyProcessor{
+		ClientBuilder: cb,
+		jobCh:         make(chan func(jobs.Executor), 10),
+	}
+}
+
+func (m *MyProcessor) Start() {
+	for i := 0; i < 8; i++ {
+		go m.loop()
+	}
+}
+
+func (m *MyProcessor) Stop() {
+	close(m.jobCh)
+}
+
+func (m *MyProcessor) loop() {
+	for job := range m.jobCh {
+		job(m.ClientBuilder())
+	}
+}
+
+func (m *MyProcessor) Process(f func(jobs.Executor)) {
+	m.jobCh <- f
 }
 
 // OUTPUT:
