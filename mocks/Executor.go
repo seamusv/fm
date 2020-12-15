@@ -3,8 +3,7 @@
 package mocks
 
 import (
-	encoding "github.com/seamusv/fm-integration/encoding"
-
+	fm_integration "github.com/seamusv/fm-integration"
 	mock "github.com/stretchr/testify/mock"
 
 	time "time"
@@ -30,7 +29,7 @@ func (_m *Executor) Err() error {
 }
 
 // Execute provides a mock function with given fields: command, messageCodes
-func (_m *Executor) Execute(command string, messageCodes ...string) *encoding.Response {
+func (_m *Executor) Execute(command string, messageCodes ...string) *fm_integration.Response {
 	_va := make([]interface{}, len(messageCodes))
 	for _i := range messageCodes {
 		_va[_i] = messageCodes[_i]
@@ -40,12 +39,12 @@ func (_m *Executor) Execute(command string, messageCodes ...string) *encoding.Re
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
-	var r0 *encoding.Response
-	if rf, ok := ret.Get(0).(func(string, ...string) *encoding.Response); ok {
+	var r0 *fm_integration.Response
+	if rf, ok := ret.Get(0).(func(string, ...string) *fm_integration.Response); ok {
 		r0 = rf(command, messageCodes...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*encoding.Response)
+			r0 = ret.Get(0).(*fm_integration.Response)
 		}
 	}
 
@@ -53,7 +52,7 @@ func (_m *Executor) Execute(command string, messageCodes ...string) *encoding.Re
 }
 
 // ExecuteFields provides a mock function with given fields: command, v, messageCodes
-func (_m *Executor) ExecuteFields(command string, v interface{}, messageCodes ...string) *encoding.Response {
+func (_m *Executor) ExecuteFields(command string, v interface{}, messageCodes ...string) *fm_integration.Response {
 	_va := make([]interface{}, len(messageCodes))
 	for _i := range messageCodes {
 		_va[_i] = messageCodes[_i]
@@ -63,12 +62,12 @@ func (_m *Executor) ExecuteFields(command string, v interface{}, messageCodes ..
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
-	var r0 *encoding.Response
-	if rf, ok := ret.Get(0).(func(string, interface{}, ...string) *encoding.Response); ok {
+	var r0 *fm_integration.Response
+	if rf, ok := ret.Get(0).(func(string, interface{}, ...string) *fm_integration.Response); ok {
 		r0 = rf(command, v, messageCodes...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*encoding.Response)
+			r0 = ret.Get(0).(*fm_integration.Response)
 		}
 	}
 

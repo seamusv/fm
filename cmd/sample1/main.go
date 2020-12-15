@@ -3,10 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/seamusv/fm-integration/encoding"
-	"github.com/seamusv/fm-integration/fm"
+	"github.com/seamusv/fm-integration"
 	"github.com/seamusv/fm-integration/http"
-	"github.com/seamusv/fm-integration/jobs"
 	"log"
 	"os"
 	"sync"
@@ -36,19 +34,19 @@ type (
 
 func main() {
 	line := AddLine{
-		AccountCode:  fm.String("551-101001-0201"),
-		MatchCode:    fm.Int(1),
-		RequiredDate: fm.Time(time.Now().Add(time.Hour * 24 * 7)),
+		AccountCode:  fm_integration.String("551-101001-0201"),
+		MatchCode:    fm_integration.Int(1),
+		RequiredDate: fm_integration.Time(time.Now().Add(time.Hour * 24 * 7)),
 	}
 
-	b, err := encoding.Marshal("ADD", line)
+	b, err := fm_integration.Marshal("ADD", line)
 	if err != nil {
 		log.Fatal(err)
 	}
 	os.Stdout.Write(b)
 	fmt.Print("\n\n-------------\n\n")
 
-	res, err := encoding.Parse([]byte(`<trans ok="Y"><screendata><return-fields><f n="STTSPRT" v="Y"></f><f n="IDBUYR" v="FMISPR"></f><f n="CODESTTS" v="2020/12/31"></f><f n="SWNOTEH" v="N"></f><f n="TEXTFRT" v=""></f><f n="CNTREL" v="6942"></f><f n="SWNOTEHN" v="N"></f><f n="LINEWHSE" v=""></f><f n="NAMEVEND" v=""></f><f n="TEXTOP01" v="TENDER TYPE"></f><f n="IDOP03" v=""></f><f n="IDOP02" v=""></f><f n="TAX02" v=""></f><f n="SPCLINST" v=""></f><f n="LINECARR" v=""></f><f n="TEXTOP03" v="SOA #"></f><f n="TEXTCARR" v=""></f><f n="CNTREV" v="0"></f><f n="LINEFOB" v=""></f><f n="LINESHPT" v=""></f><f n="TAX04" v=""></f><f n="IDLOCN" v="0"></f><f n="LINEBILL" v=""></f><f n="TAXENRP" v=""></f><f n="LINESHTY" v="1"></f><f n="IDORDR" v=""></f><f n="LASTPRT" v=""></f><f n="TAX01" v=""></f><f n="LINESCHD" v=""></f><f n="TAX03" v=""></f><f n="IDCURN" v=""></f><f n="NETORDR" v="0.00 "></f><f n="LINEMTCH" v="0"></f><f n="LINEROUT" v=""></f><f n="IDVEND" v=""></f><f n="SWNOTET" v="N"></f><f n="TEXTFOB" v=""></f><f n="LINEDLVY" v=""></f><f n="IDOP01" v=""></f><f n="LINETOL" v=""></f><f n="SWREL" v="N"></f><f n="TEXTSTTS" v="UNRELEASED"></f><f n="TEXTOP02" v="CONTRACT TYPE"></f><f n="PARTYPE" v="1"></f><f n="LINEFRT" v=""></f><f n="TEXTCTRC" v=""></f></return-fields></screendata><msgs><msg no="Z00007" v="Please enter key field"></msg></msgs></trans>`))
+	res, err := fm_integration.Parse([]byte(`<trans ok="Y"><screendata><return-fields><f n="STTSPRT" v="Y"></f><f n="IDBUYR" v="FMISPR"></f><f n="CODESTTS" v="2020/12/31"></f><f n="SWNOTEH" v="N"></f><f n="TEXTFRT" v=""></f><f n="CNTREL" v="6942"></f><f n="SWNOTEHN" v="N"></f><f n="LINEWHSE" v=""></f><f n="NAMEVEND" v=""></f><f n="TEXTOP01" v="TENDER TYPE"></f><f n="IDOP03" v=""></f><f n="IDOP02" v=""></f><f n="TAX02" v=""></f><f n="SPCLINST" v=""></f><f n="LINECARR" v=""></f><f n="TEXTOP03" v="SOA #"></f><f n="TEXTCARR" v=""></f><f n="CNTREV" v="0"></f><f n="LINEFOB" v=""></f><f n="LINESHPT" v=""></f><f n="TAX04" v=""></f><f n="IDLOCN" v="0"></f><f n="LINEBILL" v=""></f><f n="TAXENRP" v=""></f><f n="LINESHTY" v="1"></f><f n="IDORDR" v=""></f><f n="LASTPRT" v=""></f><f n="TAX01" v=""></f><f n="LINESCHD" v=""></f><f n="TAX03" v=""></f><f n="IDCURN" v=""></f><f n="NETORDR" v="0.00 "></f><f n="LINEMTCH" v="0"></f><f n="LINEROUT" v=""></f><f n="IDVEND" v=""></f><f n="SWNOTET" v="N"></f><f n="TEXTFOB" v=""></f><f n="LINEDLVY" v=""></f><f n="IDOP01" v=""></f><f n="LINETOL" v=""></f><f n="SWREL" v="N"></f><f n="TEXTSTTS" v="UNRELEASED"></f><f n="TEXTOP02" v="CONTRACT TYPE"></f><f n="PARTYPE" v="1"></f><f n="LINEFRT" v=""></f><f n="TEXTCTRC" v=""></f></return-fields></screendata><msgs><msg no="Z00007" v="Please enter key field"></msg></msgs></trans>`))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,7 +82,7 @@ func main() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			output, err := jobs.GeneratePurchaseOrderNumber(processor, time.Now(), input)
+			output, err := fm_integration.GeneratePurchaseOrderNumber(processor, time.Now(), input)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -98,13 +96,13 @@ func main() {
 
 type MyProcessor struct {
 	ClientBuilder http.ClientBuilder
-	jobCh         chan func(jobs.Executor)
+	jobCh         chan func(fm_integration.Executor)
 }
 
 func NewMyProcessor(cb http.ClientBuilder) *MyProcessor {
 	return &MyProcessor{
 		ClientBuilder: cb,
-		jobCh:         make(chan func(jobs.Executor), 10),
+		jobCh:         make(chan func(fm_integration.Executor), 10),
 	}
 }
 
@@ -124,7 +122,7 @@ func (m *MyProcessor) loop() {
 	}
 }
 
-func (m *MyProcessor) Process(f func(jobs.Executor)) {
+func (m *MyProcessor) Process(f func(fm_integration.Executor)) {
 	m.jobCh <- f
 }
 

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"github.com/seamusv/fm-integration/encoding"
+	"github.com/seamusv/fm-integration"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -85,7 +85,7 @@ func (c *Client) Logout() {
 	c.err = tmpErr
 }
 
-func (c *Client) Execute(command string, messageCodes ...string) *encoding.Response {
+func (c *Client) Execute(command string, messageCodes ...string) *fm_integration.Response {
 	if c.err != nil {
 		return nil
 	}
@@ -93,12 +93,12 @@ func (c *Client) Execute(command string, messageCodes ...string) *encoding.Respo
 	return c.ExecuteFields(command, struct{}{}, messageCodes...)
 }
 
-func (c *Client) ExecuteFields(command string, v interface{}, messageCodes ...string) *encoding.Response {
+func (c *Client) ExecuteFields(command string, v interface{}, messageCodes ...string) *fm_integration.Response {
 	if c.err != nil {
 		return nil
 	}
 
-	xmlBytes, err := encoding.Marshal(command, v)
+	xmlBytes, err := fm_integration.Marshal(command, v)
 	if err != nil {
 		c.err = err
 		return nil
@@ -112,7 +112,7 @@ func (c *Client) ExecuteFields(command string, v interface{}, messageCodes ...st
 		defer res.Body.Close()
 	}
 	body, _ := ioutil.ReadAll(res.Body)
-	response, err := encoding.Parse(body)
+	response, err := fm_integration.Parse(body)
 	if err != nil {
 		c.err = err
 		return nil

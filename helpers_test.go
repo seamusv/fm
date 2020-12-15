@@ -1,22 +1,22 @@
-package jobs
+package fm_integration_test
 
 import (
 	"fmt"
-	"github.com/seamusv/fm-integration/encoding"
+	fm_integration "github.com/seamusv/fm-integration"
 	"strings"
 	"time"
 )
 
 type MockProcessor struct {
-	Executor Executor
+	Executor fm_integration.Executor
 }
 
-func (p *MockProcessor) Process(f func(executor Executor)) {
+func (p *MockProcessor) Process(f func(executor fm_integration.Executor)) {
 	f(p.Executor)
 }
 
 func buildFieldMap(screen interface{}) (map[string]string, error) {
-	f, err := encoding.Fields(screen)
+	f, err := fm_integration.Fields(screen)
 	if err != nil {
 		return nil, err
 	}

@@ -1,9 +1,8 @@
-package jobs
+package fm_integration
 
 import (
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
-	"github.com/seamusv/fm-integration/encoding"
 	"time"
 )
 
@@ -19,8 +18,8 @@ type (
 	Executor interface {
 		Login(profile, organisation string, businessDate time.Time)
 		Logout()
-		Execute(command string, messageCodes ...string) *encoding.Response
-		ExecuteFields(command string, v interface{}, messageCodes ...string) *encoding.Response
+		Execute(command string, messageCodes ...string) *Response
+		ExecuteFields(command string, v interface{}, messageCodes ...string) *Response
 		Err() error
 	}
 )
@@ -35,3 +34,5 @@ func UnmarshalAndValidate(input []byte, v interface{}) error {
 	}
 	return validate.Struct(v)
 }
+
+//go:generate mockery --name Executor

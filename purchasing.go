@@ -1,9 +1,7 @@
-package jobs
+package fm_integration
 
 import (
 	"encoding/json"
-	"github.com/seamusv/fm-integration/fm"
-	"github.com/seamusv/fm-integration/screens"
 	"time"
 )
 
@@ -33,18 +31,18 @@ func GeneratePurchaseOrderNumber(processor Processor, businessDate time.Time, in
 		defer e.Logout()
 
 		e.Execute("PO401", "Z00007")
-		po401 := screens.PO401{
-			IDORDR:   fm.String(request.OrderNumberPrefix),
-			IDVEND:   fm.String(request.VendorCode),
-			LINEBILL: fm.String(request.BillingAddress),
-			LINESCHD: fm.Time(fm.NewFiscalYear(businessDate).End().Time()),
-			LINESHPT: fm.String(request.ShippingAddress),
-			IDOP01:   fm.String("INVITATIONAL"),
-			IDOP02:   fm.String("SERVICE"),
-			LINEMTCH: fm.Int(0),
-			LINESHTY: fm.Int(1),
-			PARTYPE:  fm.Int(2),
-			LINETOL:  fm.String("TOL3"),
+		po401 := PO401{
+			IDORDR:   String(request.OrderNumberPrefix),
+			IDVEND:   String(request.VendorCode),
+			LINEBILL: String(request.BillingAddress),
+			LINESCHD: Time(NewFiscalYear(businessDate).End().Time()),
+			LINESHPT: String(request.ShippingAddress),
+			IDOP01:   String("INVITATIONAL"),
+			IDOP02:   String("SERVICE"),
+			LINEMTCH: Int(0),
+			LINESHTY: Int(1),
+			PARTYPE:  Int(2),
+			LINETOL:  String("TOL3"),
 		}
 		e.ExecuteFields("ADD", po401, "Z00062")
 		if res := e.Execute("PROCESS", "P40163"); res != nil {
