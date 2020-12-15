@@ -1,4 +1,4 @@
-package http
+package executor
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	Client struct {
+	HttpExecutor struct {
 		client   http.Client
 		url      string
 		username string
@@ -20,13 +20,13 @@ type (
 		err      error
 	}
 
-	ClientBuilder func() *Client
+	HttpExecutorBuilder func() *HttpExecutor
 )
 
-func NewClient(url, username, password string) ClientBuilder {
-	return func() *Client {
+func NewHttpExecutor(url, username, password string) HttpExecutorBuilder {
+	return func() *HttpExecutor {
 		jar, _ := cookiejar.New(nil)
-		return &Client{
+		return &HttpExecutor{
 			client:   http.Client{Jar: jar},
 			url:      url,
 			username: username,
@@ -35,7 +35,7 @@ func NewClient(url, username, password string) ClientBuilder {
 	}
 }
 
-func (c *Client) Login(profile, organisation string, businessDate time.Time) {
+func (c *HttpExecutor) Login(profile, organisation string, businessDate time.Time) {
 	if c.err != nil {
 		return
 	}
@@ -62,7 +62,7 @@ func (c *Client) Login(profile, organisation string, businessDate time.Time) {
 	}
 }
 
-func (c *Client) Logout() {
+func (c *HttpExecutor) Logout() {
 	tmpErr := c.err
 	c.err = nil
 
@@ -85,7 +85,7 @@ func (c *Client) Logout() {
 	c.err = tmpErr
 }
 
-func (c *Client) Execute(command string, messageCodes ...string) *fm.Response {
+func (c *HttpExecutor) Execute(command string, messageCodes ...string) *fm.Response {
 	if c.err != nil {
 		return nil
 	}
@@ -93,7 +93,7 @@ func (c *Client) Execute(command string, messageCodes ...string) *fm.Response {
 	return c.ExecuteFields(command, struct{}{}, messageCodes...)
 }
 
-func (c *Client) ExecuteFields(command string, v interface{}, messageCodes ...string) *fm.Response {
+func (c *HttpExecutor) ExecuteFields(command string, v interface{}, messageCodes ...string) *fm.Response {
 	if c.err != nil {
 		return nil
 	}
@@ -125,11 +125,11 @@ func (c *Client) ExecuteFields(command string, v interface{}, messageCodes ...st
 	return response
 }
 
-func (c *Client) Err() error {
+func (c *HttpExecutor) Err() error {
 	return c.err
 }
 
-func (c *Client) post(data []byte) (*http.Response, error) {
+func (c *HttpExecutor) post(data []byte) (*http.Response, error) {
 	return c.client.Post(c.url, "text/xml", bytes.NewReader(data))
 }
 

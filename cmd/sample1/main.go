@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/seamusv/fm"
-	"github.com/seamusv/fm/http"
+	"github.com/seamusv/fm/executor.http"
 	"log"
 	"os"
 	"sync"
@@ -64,7 +64,7 @@ func main() {
 	fmt.Print("\n\n-------------\n\n")
 
 	flag.Parse()
-	clientBuilder := http.NewClient(*fmUrl, *fmUser, *fmPassword)
+	clientBuilder := executor.NewHttpExecutor(*fmUrl, *fmUser, *fmPassword)
 	processor := NewMyProcessor(clientBuilder)
 	processor.Start()
 
@@ -95,11 +95,11 @@ func main() {
 }
 
 type MyProcessor struct {
-	ClientBuilder http.ClientBuilder
+	ClientBuilder executor.HttpExecutorBuilder
 	jobCh         chan func(fm.Executor)
 }
 
-func NewMyProcessor(cb http.ClientBuilder) *MyProcessor {
+func NewMyProcessor(cb executor.HttpExecutorBuilder) *MyProcessor {
 	return &MyProcessor{
 		ClientBuilder: cb,
 		jobCh:         make(chan func(fm.Executor), 10),
