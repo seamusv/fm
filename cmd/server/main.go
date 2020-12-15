@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/seamusv/fm-integration/rabbit"
 	"github.com/streadway/amqp"
+	"log"
 	"time"
 )
 
-func main() {
-	conn, err := rabbit.GetConn("amqp://guest:guest@localhost")
+func run() error {
+	conn, err := GetConn("amqp://guest:guest@localhost")
 	if err != nil {
 		panic(err)
 	}
@@ -28,6 +28,8 @@ func main() {
 
 	forever := make(chan bool)
 	<-forever
+
+	return nil
 }
 
 func handler(d amqp.Delivery) bool {
@@ -37,4 +39,10 @@ func handler(d amqp.Delivery) bool {
 	}
 	fmt.Println(string(d.Body))
 	return true
+}
+
+func main() {
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
 }
