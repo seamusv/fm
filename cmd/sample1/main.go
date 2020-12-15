@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/seamusv/fm-integration"
-	"github.com/seamusv/fm-integration/http"
+	"github.com/seamusv/fm"
+	"github.com/seamusv/fm/http"
 	"log"
 	"os"
 	"sync"

@@ -2,21 +2,21 @@ package fm_test
 
 import (
 	"fmt"
-	fm_integration "github.com/seamusv/fm-integration"
+	"github.com/seamusv/fm"
 	"strings"
 	"time"
 )
 
 type MockProcessor struct {
-	Executor fm_integration.Executor
+	Executor fm.Executor
 }
 
-func (p *MockProcessor) Process(f func(executor fm_integration.Executor)) {
+func (p *MockProcessor) Process(f func(executor fm.Executor)) {
 	f(p.Executor)
 }
 
 func buildFieldMap(screen interface{}) (map[string]string, error) {
-	f, err := fm_integration.Fields(screen)
+	f, err := fm.Fields(screen)
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-module github.com/seamusv/fm-integration
+module github.com/seamusv/fm
 
 go 1.15
 

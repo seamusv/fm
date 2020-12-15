@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"github.com/seamusv/fm-integration"
+	"github.com/seamusv/fm"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
