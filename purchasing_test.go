@@ -1,8 +1,8 @@
 package fm_test
 
 import (
-	"github.com/seamusv/fm"
-	"github.com/seamusv/fm/mocks"
+	"github.com/seamusv/fm-integration"
+	"github.com/seamusv/fm-integration/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"

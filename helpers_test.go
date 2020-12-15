@@ -2,7 +2,7 @@ package fm_test
 
 import (
 	"fmt"
-	"github.com/seamusv/fm"
+	"github.com/seamusv/fm-integration"
 	"strings"
 	"time"
 )

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/seamusv/fm/rabbit"
+	"github.com/seamusv/fm-integration/rabbit"
 	"github.com/streadway/amqp"
 	"time"
 )
