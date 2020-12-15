@@ -1,4 +1,4 @@
-package fm_integration
+package fm
 
 import (
 	"encoding/json"

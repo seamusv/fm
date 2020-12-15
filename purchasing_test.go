@@ -1,4 +1,4 @@
-package fm_integration_test
+package fm_test
 
 import (
 	fm_integration "github.com/seamusv/fm-integration"
